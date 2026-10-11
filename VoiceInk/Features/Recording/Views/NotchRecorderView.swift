@@ -12,6 +12,7 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
     /// come from AppKit, which SwiftUI cannot observe on its own, so without this the view keeps
     /// whatever sizes it happened to compute the last time it was rendered.
     @State private var screenGeneration = 0
+    @State private var recordingStartedAt: Date?
 
     // MARK: - Display State
 
@@ -71,10 +72,10 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
 
     // MARK: - Layout Constants
 
-    private let recordingSideExpansion: CGFloat = 90
+    private let recordingSideExpansion: CGFloat = 76
     private let transcriptSideExpansion: CGFloat = 110
     private let assistantSideExpansion: CGFloat = 230
-    private let activeHeightBonus: CGFloat = 6
+    private let activeHeightBonus: CGFloat = 2
     private let transcriptPanelHeight: CGFloat = 57
     private let assistantPanelHeight: CGFloat = 320
 
@@ -145,6 +146,12 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
         ) { _ in
             screenGeneration += 1
         }
+        .onAppear {
+            if stateProvider.recordingState == .recording { recordingStartedAt = Date() }
+        }
+        .onChange(of: stateProvider.recordingState) { oldState, newState in
+            if newState == .recording, oldState != .recording { recordingStartedAt = Date() }
+        }
     }
 
     // MARK: - Pill
@@ -160,7 +167,7 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
         .clipShape(
             NotchShape(
                 topCornerRadius: displayState == .liveText ? 12 : 8,
-                bottomCornerRadius: displayState == .liveText || displayState == .assistant ? 22 : 16
+                bottomCornerRadius: displayState == .liveText || displayState == .assistant ? 22 : 14
             )
         )
     }
@@ -171,16 +178,14 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
         ZStack {
             Color.clear
 
-            HStack(spacing: 14) {
+            HStack(spacing: 0) {
                 if shouldShowCloseButton {
                     RecorderCloseButton(action: onCloseTapped)
                 } else {
-                    RecorderRecordButton(
-                        recordingState: stateProvider.recordingState,
-                        action: onRecordButtonTapped
-                    )
+                    Button(action: onRecordButtonTapped) { leadingIsland }
+                        .buttonStyle(.plain)
+                        .disabled(stateProvider.recordingState != .recording && stateProvider.recordingState != .idle)
                 }
-                RecorderModeButton(buttonSize: 20, padding: EdgeInsets())
                 Spacer(minLength: 0)
             }
             .padding(.leading, sideEdgePadding)
@@ -194,11 +199,7 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
 
             HStack(spacing: 0) {
                 Spacer(minLength: 0)
-                RecorderStatusDisplay(
-                    currentState: stateProvider.recordingState,
-                    audioMeterProvider: recorder.audioMeterSnapshot,
-                    menuBarHeight: notchHeight
-                )
+                trailingIsland
             }
             .padding(.trailing, sideEdgePadding)
             .frame(width: sideExpansion)
@@ -210,6 +211,35 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
             )
         }
         .frame(height: mainRowHeight)
+    }
+
+    @ViewBuilder
+    private var leadingIsland: some View {
+        switch stateProvider.recordingState {
+        case .transcribing, .enhancing:
+            NotchIslandSpinner()
+        default:
+            HStack(spacing: 7) {
+                NotchIslandRecordingDot()
+                if let recordingStartedAt, stateProvider.recordingState == .recording {
+                    NotchIslandElapsedTime(startedAt: recordingStartedAt)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var trailingIsland: some View {
+        switch stateProvider.recordingState {
+        case .transcribing, .enhancing:
+            NotchIslandProcessingIndicator()
+        default:
+            NotchIslandWaveform(
+                levelProvider: { Double(recorder.audioMeterSnapshot().averagePower) },
+                isActive: stateProvider.recordingState == .recording,
+                maxBarHeight: max(10, notchHeight - 14)
+            )
+        }
     }
 
     // MARK: - Live Text Panel
