@@ -146,9 +146,9 @@ enum AppDefaults {
             // Recording & Transcription
             "IsTextFormattingEnabled": true,
             "IsVADEnabled": true,
-            "SelectedLanguage": "en",
+            "SelectedLanguage": "fr",
             "AppendTrailingSpace": true,
-            "RecorderType": "mini",
+            "RecorderType": "notch",
             RecorderDisplaySettingsKeys.showLiveTranscript: true,
             CloudTranscriptionSettings.timeoutKey: CloudTranscriptionSettings.defaultTimeout,
             AutoLearnSettings.isEnabledKey: true,

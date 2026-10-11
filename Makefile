@@ -3,7 +3,7 @@ DEPS_DIR := $(HOME)/VoiceInk-Dependencies
 WHISPER_CPP_DIR := $(DEPS_DIR)/whisper.cpp
 FRAMEWORK_PATH := $(WHISPER_CPP_DIR)/build-apple/whisper.xcframework
 LOCAL_DERIVED_DATA := $(CURDIR)/.local-build
-LOCAL_CODESIGN_IDENTITY ?=
+LOCAL_CODESIGN_IDENTITY ?= C3542F0B1C830C4B91E42AD38E15C2BD42A8A9D8
 RUN_APP_NAME ?= VoiceInk
 
 .PHONY: all clean whisper setup build local check healthcheck help dev run release release-setup
@@ -118,6 +118,18 @@ run:
 			exit 1; \
 		fi; \
 	fi
+
+# Xcode 27 signs "to run locally" despite the identity override, so re-sign to keep macOS permissions across rebuilds
+install: local
+	@test -n "$(LOCAL_CODESIGN_IDENTITY)" || { echo "Set LOCAL_CODESIGN_IDENTITY"; exit 1; }
+	@codesign --force --deep --options runtime --timestamp=none \
+		--entitlements "$(CURDIR)/VoiceInk/VoiceInk.local.entitlements" \
+		--sign "$(LOCAL_CODESIGN_IDENTITY)" "$$HOME/Downloads/VoiceInk.app"
+	@osascript -e 'quit app "VoiceInk"' 2>/dev/null || true
+	@rm -rf /Applications/VoiceInk.app
+	@ditto "$$HOME/Downloads/VoiceInk.app" /Applications/VoiceInk.app
+	@rm -rf "$$HOME/Downloads/VoiceInk.app"
+	@echo "Installed /Applications/VoiceInk.app"
 
 # Build a signed, notarized DMG and matching local Sparkle Appcast.
 release: whisper
