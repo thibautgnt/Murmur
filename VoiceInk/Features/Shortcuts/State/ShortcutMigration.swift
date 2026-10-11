@@ -107,7 +107,7 @@ enum ShortcutMigration {
             return mode
         }
 
-        return .pushToTalk
+        return .hybrid
     }
 
     private static func shortcutSelection(
