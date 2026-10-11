@@ -120,6 +120,9 @@ enum AIProvider: String, CaseIterable {
             ]
         case .anthropic:
             return [
+                "claude-opus-5-5",
+                "claude-sonnet-5-5",
+                "claude-haiku-5-5",
                 "claude-sonnet-5",
                 "claude-haiku-4-5",
             ]
