@@ -3,7 +3,7 @@ import Combine
 import Foundation
 import SwiftData
 
-// Drives the Dashboard's "help people discover VoiceInk" GitHub star card; gated on session count, not just window launch.
+// Drives the Dashboard's "help people discover Murmur" GitHub star card; gated on session count, not just window launch.
 @MainActor
 final class GitHubStarPromptCoordinator: ObservableObject {
     static let shared = GitHubStarPromptCoordinator()

@@ -37,7 +37,7 @@ final class LogExporter {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
 
-        logLines.append("=== VoiceInk Diagnostic Logs ===")
+        logLines.append("=== Murmur Diagnostic Logs ===")
         logLines.append("Export Date: \(dateFormatter.string(from: exportDate))")
         logLines.append("Subsystem: \(subsystem)")
         logLines.append("Log Window: Last 30 minutes")
@@ -67,7 +67,7 @@ final class LogExporter {
         }
 
         if logCount == 0 {
-            logLines.append("No VoiceInk logs found in the last 30 minutes.")
+            logLines.append("No Murmur logs found in the last 30 minutes.")
         }
 
         return logLines
@@ -89,7 +89,7 @@ final class LogExporter {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
         let timestamp = dateFormatter.string(from: Date())
-        let fileName = "VoiceInk_Logs_\(timestamp).log"
+        let fileName = "Murmur_Logs_\(timestamp).log"
 
         guard let downloadsURL = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first else {
             throw NSError(

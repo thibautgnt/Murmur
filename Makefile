@@ -4,7 +4,7 @@ WHISPER_CPP_DIR := $(DEPS_DIR)/whisper.cpp
 FRAMEWORK_PATH := $(WHISPER_CPP_DIR)/build-apple/whisper.xcframework
 LOCAL_DERIVED_DATA := $(CURDIR)/.local-build
 LOCAL_CODESIGN_IDENTITY ?= C3542F0B1C830C4B91E42AD38E15C2BD42A8A9D8
-RUN_APP_NAME ?= VoiceInk
+RUN_APP_NAME ?= Murmur
 
 .PHONY: all clean whisper setup build local check healthcheck help dev run release release-setup
 
@@ -12,7 +12,7 @@ RUN_APP_NAME ?= VoiceInk
 all: check build
 
 # Development workflow
-dev: RUN_APP_NAME = VoiceInk Dev
+dev: RUN_APP_NAME = Murmur Dev
 dev: build run
 
 # Prerequisites
@@ -52,7 +52,7 @@ build: setup
 
 # Build locally with stable Apple Development signing when available.
 local: check setup
-	@echo "Building VoiceInk for local use (no Apple Developer certificate required)..."
+	@echo "Building Murmur for local use (no Apple Developer certificate required)..."
 	@rm -rf "$(LOCAL_DERIVED_DATA)"
 	@SIGNING_IDENTITY="$(LOCAL_CODESIGN_IDENTITY)"; \
 	if [ -z "$$SIGNING_IDENTITY" ]; then \
@@ -84,21 +84,21 @@ local: check setup
 		-skipPackagePluginValidation \
 		-skipMacroValidation \
 		build
-	@APP_PATH="$(LOCAL_DERIVED_DATA)/Build/Products/Release/VoiceInk.app" && \
+	@APP_PATH="$(LOCAL_DERIVED_DATA)/Build/Products/Release/Murmur.app" && \
 	if [ -d "$$APP_PATH" ]; then \
-		echo "Copying VoiceInk.app to ~/Downloads..."; \
-		rm -rf "$$HOME/Downloads/VoiceInk.app"; \
-		ditto "$$APP_PATH" "$$HOME/Downloads/VoiceInk.app"; \
-		xattr -cr "$$HOME/Downloads/VoiceInk.app"; \
+		echo "Copying Murmur.app to ~/Downloads..."; \
+		rm -rf "$$HOME/Downloads/Murmur.app"; \
+		ditto "$$APP_PATH" "$$HOME/Downloads/Murmur.app"; \
+		xattr -cr "$$HOME/Downloads/Murmur.app"; \
 		echo ""; \
-		echo "Build complete! App saved to: ~/Downloads/VoiceInk.app"; \
-		echo "Run with: open ~/Downloads/VoiceInk.app"; \
+		echo "Build complete! App saved to: ~/Downloads/Murmur.app"; \
+		echo "Run with: open ~/Downloads/Murmur.app"; \
 		echo ""; \
 		echo "Limitations of local builds:"; \
 		echo "  - No iCloud dictionary sync"; \
 		echo "  - No automatic updates (pull new code and rebuild to update)"; \
 	else \
-		echo "Error: Could not find built VoiceInk.app at $$APP_PATH"; \
+		echo "Error: Could not find built Murmur.app at $$APP_PATH"; \
 		exit 1; \
 	fi
 
@@ -124,12 +124,12 @@ install: local
 	@test -n "$(LOCAL_CODESIGN_IDENTITY)" || { echo "Set LOCAL_CODESIGN_IDENTITY"; exit 1; }
 	@codesign --force --deep --options runtime --timestamp=none \
 		--entitlements "$(CURDIR)/VoiceInk/VoiceInk.local.entitlements" \
-		--sign "$(LOCAL_CODESIGN_IDENTITY)" "$$HOME/Downloads/VoiceInk.app"
-	@osascript -e 'quit app "VoiceInk"' 2>/dev/null || true
-	@rm -rf /Applications/VoiceInk.app
-	@ditto "$$HOME/Downloads/VoiceInk.app" /Applications/VoiceInk.app
-	@rm -rf "$$HOME/Downloads/VoiceInk.app"
-	@echo "Installed /Applications/VoiceInk.app"
+		--sign "$(LOCAL_CODESIGN_IDENTITY)" "$$HOME/Downloads/Murmur.app"
+	@osascript -e 'quit app "Murmur"' 2>/dev/null || true
+	@rm -rf /Applications/Murmur.app
+	@ditto "$$HOME/Downloads/Murmur.app" /Applications/Murmur.app
+	@rm -rf "$$HOME/Downloads/Murmur.app"
+	@echo "Installed /Applications/Murmur.app"
 
 # Build a signed, notarized DMG and matching local Sparkle Appcast.
 release: whisper
@@ -154,11 +154,11 @@ help:
 	@echo "Available targets:"
 	@echo "  check/healthcheck  Check if required CLI tools are installed"
 	@echo "  whisper            Clone and build whisper.cpp XCFramework"
-	@echo "  setup              Copy whisper XCFramework to VoiceInk project"
-	@echo "  build              Build the VoiceInk Xcode project"
+	@echo "  setup              Copy whisper XCFramework to the project"
+	@echo "  build              Build the Xcode project"
 	@echo "  local              Build locally with stable signing when available"
 	@echo "    LOCAL_CODESIGN_IDENTITY=<SHA or name> overrides automatic Apple Development detection"
-	@echo "  run                Launch the built VoiceInk app"
+	@echo "  run                Launch the built Murmur app"
 	@echo "  dev                Build and run the app (for development)"
 	@echo "  release            Build DMG and Appcast using release-notes/<version>.html"
 	@echo "  release-setup      Store notarization credentials in Keychain"
