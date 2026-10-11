@@ -72,7 +72,7 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
 
     // MARK: - Layout Constants
 
-    private let recordingSideExpansion: CGFloat = 76
+    private let recordingSideExpansion: CGFloat = 62
     private let transcriptSideExpansion: CGFloat = 110
     private let assistantSideExpansion: CGFloat = 230
     private let activeHeightBonus: CGFloat = 2
@@ -113,7 +113,7 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
     }
 
     private var sideEdgePadding: CGFloat {
-        displayState == .liveText || displayState == .assistant ? 20 : 16
+        displayState == .liveText || displayState == .assistant ? 20 : 12
     }
 
     private var shouldShowCloseButton: Bool {
@@ -219,11 +219,9 @@ struct NotchRecorderView<S: RecorderStateProvider & ObservableObject>: View {
         case .transcribing, .enhancing:
             NotchIslandSpinner()
         default:
-            HStack(spacing: 7) {
+            HStack(spacing: 6) {
                 NotchIslandRecordingDot()
-                if let recordingStartedAt, stateProvider.recordingState == .recording {
-                    NotchIslandElapsedTime(startedAt: recordingStartedAt)
-                }
+                NotchIslandElapsedTime(startedAt: recordingStartedAt ?? Date())
             }
         }
     }
