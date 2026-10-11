@@ -1,3 +1,4 @@
+import CoreAudio
 import Foundation
 import SwiftUI
 
@@ -33,18 +34,37 @@ class SoundManager: ObservableObject {
         setupSounds()
     }
 
+    // Playing a cue on Bluetooth headphones makes AirPods hop over from the iPhone, cutting what is playing there
+    private var isDefaultOutputBuiltIn: Bool {
+        var deviceID = AudioDeviceID(0)
+        var size = UInt32(MemoryLayout<AudioDeviceID>.size)
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDefaultOutputDevice,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        guard AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &address, 0, nil, &size, &deviceID) == noErr
+        else { return false }
+
+        var transportType = UInt32(0)
+        size = UInt32(MemoryLayout<UInt32>.size)
+        address.mSelector = kAudioDevicePropertyTransportType
+        guard AudioObjectGetPropertyData(deviceID, &address, 0, nil, &size, &transportType) == noErr else { return false }
+        return transportType == kAudioDeviceTransportTypeBuiltIn
+    }
+
     func playStartSound() {
-        guard CustomSoundManager.shared.isSoundEnabled(for: .start) else { return }
+        guard CustomSoundManager.shared.isSoundEnabled(for: .start), isDefaultOutputBuiltIn else { return }
         playbackEngine.playStartSound()
     }
 
     func playStopSound() {
-        guard CustomSoundManager.shared.isSoundEnabled(for: .stop) else { return }
+        guard CustomSoundManager.shared.isSoundEnabled(for: .stop), isDefaultOutputBuiltIn else { return }
         playbackEngine.playStopSound()
     }
 
     func playEscSound() {
-        guard CustomSoundManager.shared.hasAnyRecordingSoundEnabled else { return }
+        guard CustomSoundManager.shared.hasAnyRecordingSoundEnabled, isDefaultOutputBuiltIn else { return }
         playbackEngine.playEscSound()
     }
 }
