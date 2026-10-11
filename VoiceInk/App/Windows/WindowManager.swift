@@ -200,6 +200,17 @@ class WindowManager: NSObject {
 }
 
 extension WindowManager: NSWindowDelegate {
+    // Without the menu bar icon nothing could reopen a destroyed main window, so closing only hides it
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        guard sender.identifier == Self.mainWindowIdentifier,
+            !UserDefaults.standard.bool(forKey: "ShowMenuBarIcon")
+        else { return true }
+
+        sender.orderOut(nil)
+        AppPresentationPolicy.restoreAccessoryIfNeededAfterUserFacingWindowClosed()
+        return false
+    }
+
     func windowWillClose(_ notification: Notification) {
         guard let window = notification.object as? NSWindow else { return }
         if window.identifier == Self.mainWindowIdentifier {

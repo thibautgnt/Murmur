@@ -10,6 +10,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !UserDefaults.standard.bool(forKey: "ShowMenuBarIcon"), WindowManager.shared.showMainWindow() != nil {
+            return false
+        }
+
         if let menuBarManager, !menuBarManager.isMenuBarOnly {
             if WindowManager.shared.currentMainWindow() != nil {
                 WindowManager.shared.showMainWindow()

@@ -162,6 +162,7 @@ enum AppDefaults {
 
             // UI & Behavior
             "IsMenuBarOnly": true,
+            "ShowMenuBarIcon": false,
             AppAppearancePreference.userDefaultsKey: AppAppearancePreference.system.rawValue,
             AppLanguagePreference.userDefaultsKey: AppLanguagePreference.systemValue,
             // Enhancement
