@@ -30,8 +30,7 @@ final class GitHubStarPromptCoordinator: ObservableObject {
     // Brief, non-blocking feedback when NSWorkspace fails to open the repo URL - card stays up so the user can retry.
     @Published private(set) var openFailed = false
 
-    // Shown in the Dashboard footer only once Later has been clicked - never appears from a toast-only flow.
-    var showsFooterStarButton: Bool { hasDeferredAtLeastOnce && (!isResolved || completionState != .none) }
+    var showsFooterStarButton: Bool { false }
 
     private static let repoURL = URL(string: "https://github.com/Beingpax/VoiceInk")!
     private static let showDelaySeconds: TimeInterval = 3
@@ -146,13 +145,8 @@ final class GitHubStarPromptCoordinator: ObservableObject {
         isVisible = false
     }
 
-    // Once Later has been clicked, the toast retires for good; the persistent footer button takes over.
-    private static var shouldShow: Bool {
-        let defaults = UserDefaults.standard
-        if defaults.bool(forKey: Keys.hasStarred) { return false }
-        if defaults.bool(forKey: Keys.hasDeferredOnce) { return false }
-        return true
-    }
+    // Personal build: never ask for a GitHub star
+    private static var shouldShow: Bool { false }
 
     private func hasReachedSessionThreshold() async -> Bool {
         guard let modelContainer else { return false }
