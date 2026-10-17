@@ -6,7 +6,7 @@
    À défaut : ouvrir l'app, puis Réglages Système > Confidentialité et sécurité > « Ouvrir quand même ».
 3. Ouvrir Murmur et accorder le **micro** et l'**accessibilité**. Le modèle Parakeet se télécharge au premier lancement.
 
-À chaque nouvelle version, refaire les étapes 1 et 2 ; macOS peut redemander les autorisations.
+Ensuite, Murmur propose lui-même les nouvelles versions (Paramètres > Vérifier automatiquement les mises à jour) ; macOS peut redemander les autorisations après une mise à jour.
 
 Pour la retouche par Claude, mettre sa propre clé API Anthropic dans les réglages. Ne pas installer en parallèle de VoiceInk : les deux apps partagent leurs réglages et leurs données.
 

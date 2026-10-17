@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="400" viewBox="0 0 960 400" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1b1f3a"/>
+      <stop offset="0.55" stop-color="#3b2350"/>
+      <stop offset="1" stop-color="#7a3b3b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0" r="0.7">
+      <stop offset="0" stop-color="#ff4a3b" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#ff4a3b" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="screen"><rect width="960" height="400" rx="28"/></clipPath>
+  </defs>
+  <g clip-path="url(#screen)">
+    <rect width="960" height="400" fill="url(#wall)"/>
+    <rect width="960" height="400" fill="url(#glow)"/>
+    <rect width="960" height="34" fill="#000" opacity="0.28"/>
+    <text x="28" y="22" font-size="13" font-weight="600" fill="#fff" opacity="0.85">Notes</text>
+    <text x="880" y="22" font-size="13" fill="#fff" opacity="0.75">16:42</text>
+
+    <path d="M330 0 H630 V16 Q630 48 598 48 H362 Q330 48 330 16 Z" fill="#000"/>
+    <circle cx="362" cy="24" r="4" fill="#ff4a3b"/>
+    <circle cx="362" cy="24" r="4" fill="#ff4a3b" opacity="0.5">
+      <animate attributeName="r" values="4;10;4" dur="1.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.55;0;0.55" dur="1.6s" repeatCount="indefinite"/>
+    </circle>
+    <text x="376" y="29" font-size="13" font-weight="600" fill="#fff" fill-opacity="0.92">0:07</text>
+    <g fill="#fff" fill-opacity="0.92">
+      <rect x="566" width="3.5" rx="1.75"><animate attributeName="height" values="6;14;8;6" dur="0.9s" repeatCount="indefinite"/><animate attributeName="y" values="21;17;20;21" dur="0.9s" repeatCount="indefinite"/></rect>
+      <rect x="572" width="3.5" rx="1.75"><animate attributeName="height" values="10;20;12;10" dur="0.7s" repeatCount="indefinite"/><animate attributeName="y" values="19;14;18;19" dur="0.7s" repeatCount="indefinite"/></rect>
+      <rect x="578" width="3.5" rx="1.75"><animate attributeName="height" values="16;8;22;16" dur="0.8s" repeatCount="indefinite"/><animate attributeName="y" values="16;20;13;16" dur="0.8s" repeatCount="indefinite"/></rect>
+      <rect x="584" width="3.5" rx="1.75"><animate attributeName="height" values="9;18;11;9" dur="0.75s" repeatCount="indefinite"/><animate attributeName="y" values="19.5;15;18.5;19.5" dur="0.75s" repeatCount="indefinite"/></rect>
+      <rect x="590" width="3.5" rx="1.75"><animate attributeName="height" values="5;11;7;5" dur="0.95s" repeatCount="indefinite"/><animate attributeName="y" values="21.5;18.5;20.5;21.5" dur="0.95s" repeatCount="indefinite"/></rect>
+    </g>
+
+    <rect x="180" y="104" width="600" height="250" rx="16" fill="#1e1e22" opacity="0.94"/>
+    <circle cx="204" cy="126" r="6" fill="#ff5f57"/>
+    <circle cx="224" cy="126" r="6" fill="#febc2e"/>
+    <circle cx="244" cy="126" r="6" fill="#28c840"/>
+    <text x="214" y="182" font-size="22" font-weight="700" fill="#fff">Compte rendu de réunion</text>
+    <text x="214" y="222" font-size="17" fill="#fff" fill-opacity="0.78">On parle, Murmur transcrit sur le Mac,</text>
+    <text x="214" y="250" font-size="17" fill="#fff" fill-opacity="0.78">et le texte arrive là où on écrit.<tspan fill="#ff4a3b" fill-opacity="1" font-weight="300">▎<animate attributeName="fill-opacity" values="1;1;0;0" dur="1s" repeatCount="indefinite"/></tspan></text>
+    <text x="214" y="310" font-size="13" fill="#fff" fill-opacity="0.4">Parakeet v3 · 100 % local · français</text>
+  </g>
+</svg>
