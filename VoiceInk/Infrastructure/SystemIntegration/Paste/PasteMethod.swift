@@ -37,7 +37,7 @@ enum PasteMethod: String, CaseIterable, Identifiable {
             return method
         }
 
-        return defaults.bool(forKey: legacyAppleScriptPasteKey) ? .appleScript : .standard
+        return defaults.bool(forKey: legacyAppleScriptPasteKey) ? .appleScript : .directTyping
     }
 
     static func setCurrent(_ method: PasteMethod, in defaults: UserDefaults = .standard) {
@@ -52,6 +52,6 @@ enum PasteMethod: String, CaseIterable, Identifiable {
             return
         }
 
-        setCurrent(defaults.bool(forKey: legacyAppleScriptPasteKey) ? .appleScript : .standard, in: defaults)
+        setCurrent(defaults.bool(forKey: legacyAppleScriptPasteKey) ? .appleScript : .directTyping, in: defaults)
     }
 }

@@ -18,7 +18,7 @@ struct SettingsView: View {
     @AppStorage("enableAnnouncements") private var enableAnnouncements = true
     @AppStorage("restoreClipboardAfterPaste") private var restoreClipboardAfterPaste = true
     @AppStorage("clipboardRestoreDelay") private var clipboardRestoreDelay = 2.0
-    @AppStorage(PasteMethod.userDefaultsKey) private var pasteMethodRawValue = PasteMethod.standard.rawValue
+    @AppStorage(PasteMethod.userDefaultsKey) private var pasteMethodRawValue = PasteMethod.directTyping.rawValue
     @AppStorage(AppAppearancePreference.userDefaultsKey) private var appAppearancePreference = AppAppearancePreference
         .system
     @AppStorage(AppLanguagePreference.userDefaultsKey) private var appLanguagePreference = AppLanguagePreference
@@ -179,7 +179,7 @@ struct SettingsView: View {
                 .pickerStyle(.menu)
                 .onChange(of: pasteMethodRawValue) { _, newValue in
                     guard let method = PasteMethod(rawValue: newValue) else {
-                        pasteMethodRawValue = PasteMethod.standard.rawValue
+                        pasteMethodRawValue = PasteMethod.directTyping.rawValue
                         return
                     }
                     PasteMethod.setCurrent(method)
