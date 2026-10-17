@@ -1,5 +1,6 @@
 import AppKit
 import Foundation
+import os
 import SwiftUI
 
 /// Checks the GitHub releases of the Murmur repository. The build commit is
@@ -40,6 +41,7 @@ final class UpdaterViewModel: ObservableObject {
         case unavailable(String)
     }
 
+    private static let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "Updater")
     private static let repository = "thibautgnt/Murmur"
     private static let assetName = "Murmur.zip"
     private static let checkInterval: TimeInterval = 6 * 60 * 60
@@ -101,6 +103,7 @@ final class UpdaterViewModel: ObservableObject {
         let result = await fetchUpdate()
         canCheckForUpdates = true
         defaults.set(Date(), forKey: DefaultsKey.lastUpdateCheck)
+        Self.logger.notice("Update check build=\(self.buildCommit ?? "none", privacy: .public) result=\(String(describing: result), privacy: .public)")
 
         switch result {
         case .available(let update):
@@ -161,7 +164,8 @@ final class UpdaterViewModel: ObservableObject {
     }
 
     private func offer(_ update: AvailableUpdate) async {
-        NSApp.activate(ignoringOtherApps: true)
+        AppPresentationPolicy.activateForUserFacingWindow()
+        defer { AppPresentationPolicy.restoreAccessoryIfNeededAfterUserFacingWindowClosed() }
         let alert = NSAlert()
         alert.messageText = String(localized: "A new version of Murmur is available")
         alert.informativeText = String(
@@ -249,7 +253,8 @@ final class UpdaterViewModel: ObservableObject {
     }
 
     private func showAlert(title: String, message: String) {
-        NSApp.activate(ignoringOtherApps: true)
+        AppPresentationPolicy.activateForUserFacingWindow()
+        defer { AppPresentationPolicy.restoreAccessoryIfNeededAfterUserFacingWindowClosed() }
         let alert = NSAlert()
         alert.messageText = title
         alert.informativeText = message
