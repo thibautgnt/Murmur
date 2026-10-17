@@ -31,6 +31,16 @@ make install
 Compile, signe avec le certificat Apple Development personnel et installe `/Applications/Murmur.app`.
 La signature stable évite de redonner les autorisations micro et accessibilité à chaque build.
 
+## Partager une version
+
+```bash
+make share
+```
+
+Compile une version signée ad hoc (sans compte développeur) et la publie dans les Releases de ce dépôt, avec les
+instructions d'installation de `scripts/share-notes.md`. Le dépôt est privé : seuls les collaborateurs ajoutés
+peuvent télécharger. Le travail doit être commité et poussé avant.
+
 ## Licence
 
 GPLv3, voir [LICENSE](LICENSE). Murmur est dérivé de [VoiceInk](https://github.com/Beingpax/VoiceInk) de Beingpax.
