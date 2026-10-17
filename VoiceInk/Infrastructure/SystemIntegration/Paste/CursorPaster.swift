@@ -67,11 +67,13 @@ class CursorPaster {
         let startedAt = ProcessInfo.processInfo.systemUptime
         let queueWaitMs = elapsedMilliseconds(since: requestedAt)
         let sessionID = UUID().uuidString
-        let method = PasteMethod.current()
+        let application = NSWorkspace.shared.frontmostApplication
+        let preferredMethod = PasteMethod.current()
+        let method = resolvedMethod(preferredMethod, for: application)
         let textToDeliver = method == .directTyping ? DirectTextTyper.normalizedText(text) : text
         let pasteboard: NSPasteboard? = method.usesClipboard ? NSPasteboard.general : nil
         let shouldRestoreClipboard = pasteboard != nil
-            && UserDefaults.standard.bool(forKey: "restoreClipboardAfterPaste")
+            && (preferredMethod == .directTyping || UserDefaults.standard.bool(forKey: "restoreClipboardAfterPaste"))
         let savedContents: ClipboardSnapshot
         if let pasteboard {
             savedContents = shouldRestoreClipboard ? snapshotClipboard(from: pasteboard) : []
@@ -92,7 +94,6 @@ class CursorPaster {
             savedContents = []
         }
 
-        let application = NSWorkspace.shared.frontmostApplication
         let appIdentifier = application?.bundleIdentifier ?? "unknown"
         let pasteResult = await deliverText(textToDeliver, method: method, sessionID: sessionID)
         logger.notice(
@@ -135,6 +136,14 @@ class CursorPaster {
                 return nil
             }
         }
+    }
+
+    // Electron apps feed key events to xterm.js-style hidden textareas, which
+    // retype the tail of fast Unicode events; paste there and restore the clipboard.
+    private static func resolvedMethod(_ method: PasteMethod, for application: NSRunningApplication?) -> PasteMethod {
+        guard method == .directTyping, let bundleURL = application?.bundleURL else { return method }
+        let electronFramework = bundleURL.appendingPathComponent("Contents/Frameworks/Electron Framework.framework")
+        return FileManager.default.fileExists(atPath: electronFramework.path) ? .standard : method
     }
 
     @MainActor
