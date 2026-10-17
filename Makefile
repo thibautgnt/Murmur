@@ -143,7 +143,7 @@ share:
 	rm -f "$(LOCAL_DERIVED_DATA)/Murmur.zip"; \
 	ditto -c -k --keepParent "$$HOME/Downloads/Murmur.app" "$(LOCAL_DERIVED_DATA)/Murmur.zip" && \
 	rm -rf "$$HOME/Downloads/Murmur.app" && \
-	gh release create "$$TAG" "$(LOCAL_DERIVED_DATA)/Murmur.zip" --target "$$(git rev-parse HEAD)" \
+	gh release create -R thibautgnt/Murmur "$$TAG" "$(LOCAL_DERIVED_DATA)/Murmur.zip" --target "$$(git rev-parse HEAD)" \
 		--title "Murmur $$VERSION ($$(date +%d/%m/%Y))" --notes-file scripts/share-notes.md
 
 # Build a signed, notarized DMG and matching local Sparkle Appcast.
