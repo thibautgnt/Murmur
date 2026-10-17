@@ -122,6 +122,7 @@ run:
 # Xcode 27 signs "to run locally" despite the identity override, so re-sign to keep macOS permissions across rebuilds
 install: local
 	@test -n "$(LOCAL_CODESIGN_IDENTITY)" || { echo "Set LOCAL_CODESIGN_IDENTITY"; exit 1; }
+	@/usr/libexec/PlistBuddy -c "Add :MurmurCommit string $$(git rev-parse HEAD)" "$$HOME/Downloads/Murmur.app/Contents/Info.plist"
 	@codesign --force --deep --options runtime --timestamp=none \
 		--entitlements "$(CURDIR)/VoiceInk/VoiceInk.local.entitlements" \
 		--sign "$(LOCAL_CODESIGN_IDENTITY)" "$$HOME/Downloads/Murmur.app"
@@ -135,6 +136,7 @@ install: local
 share:
 	@git diff --quiet HEAD && test -z "$$(git log origin/main..HEAD)" || { echo "Commit and push first"; exit 1; }
 	@$(MAKE) local LOCAL_CODESIGN_IDENTITY=-
+	@/usr/libexec/PlistBuddy -c "Add :MurmurCommit string $$(git rev-parse HEAD)" "$$HOME/Downloads/Murmur.app/Contents/Info.plist"
 	@codesign --force --deep --options runtime --timestamp=none \
 		--entitlements "$(CURDIR)/VoiceInk/VoiceInk.local.entitlements" \
 		--sign - "$$HOME/Downloads/Murmur.app"

@@ -6108,7 +6108,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rechercher automatiquement les mises à jour"
+            "value" : "Vérifier automatiquement les mises à jour"
           }
         },
         "zh-Hans" : {
@@ -31041,6 +31041,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "你的字数和基准对比会显示在这里。"
+          }
+        }
+      }
+    },
+    "Murmur is up to date" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Murmur est à jour"
+          }
+        }
+      }
+    },
+    "You have the latest version." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez la dernière version."
+          }
+        }
+      }
+    },
+    "Unable to check for updates" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de vérifier les mises à jour"
+          }
+        }
+      }
+    },
+    "This development build cannot check for updates." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette version de développement ne peut pas vérifier les mises à jour."
+          }
+        }
+      }
+    },
+    "A new version of Murmur is available" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une nouvelle version de Murmur est disponible"
+          }
+        }
+      }
+    },
+    "%@ is available. Update now? Murmur will restart." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ est disponible. Mettre à jour maintenant ? Murmur va redémarrer."
+          }
+        }
+      }
+    },
+    "Update Now" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre à jour"
+          }
+        }
+      }
+    },
+    "The update could not be installed" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La mise à jour n'a pas pu être installée"
           }
         }
       }
