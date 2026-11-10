@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#14172e"/>
+      <stop offset="0.5" stop-color="#34204a"/>
+      <stop offset="1" stop-color="#7a3b3b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0" r="0.75">
+      <stop offset="0" stop-color="#ff4a3b" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#ff4a3b" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="halo">
+      <stop offset="0" stop-color="#ff4a3b" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ff4a3b" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="title" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#ffc9c2"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="640" fill="url(#wall)"/>
+  <rect width="1280" height="640" fill="url(#glow)"/>
+  <g stroke="#fff" stroke-opacity="0.05">
+    <path d="M0 160 H1280 M0 320 H1280 M0 480 H1280 M160 0 V640 M320 0 V640 M480 0 V640 M640 0 V640 M800 0 V640 M960 0 V640 M1120 0 V640"/>
+  </g>
+
+  <path d="M430 0 H850 V22 Q850 68 804 68 H476 Q430 68 430 22 Z" fill="#000"/>
+  <circle cx="478" cy="34" r="22" fill="url(#halo)"/>
+  <circle cx="478" cy="34" r="6" fill="#ff4a3b"/>
+  <text x="498" y="41" font-size="19" font-weight="600" fill="#fff" fill-opacity="0.92">2:26</text>
+  <g fill="#fff" fill-opacity="0.92">
+    <rect x="770" y="27" width="5" height="14" rx="2.5"/>
+    <rect x="779" y="21" width="5" height="26" rx="2.5"/>
+    <rect x="788" y="16" width="5" height="36" rx="2.5"/>
+    <rect x="797" y="23" width="5" height="22" rx="2.5"/>
+    <rect x="806" y="29" width="5" height="10" rx="2.5"/>
+  </g>
+
+  <text x="640" y="232" text-anchor="middle" font-size="30" font-weight="600" fill="#ff8a7e" letter-spacing="6">NOUVELLE VERSION</text>
+  <text x="640" y="350" text-anchor="middle" font-size="128" font-weight="800" fill="url(#title)" letter-spacing="-3">Murmur 2.26</text>
+  <text x="640" y="406" text-anchor="middle" font-size="27" fill="#fff" fill-opacity="0.72">Un dictionnaire qui apprend, une ponctuation qui suit le texte</text>
+
+  <g font-size="21" font-weight="600" fill="#fff">
+    <rect x="137" y="468" width="252" height="50" rx="25" fill="#fff" fill-opacity="0.10" stroke="#fff" stroke-opacity="0.18"/>
+    <text x="263" y="500" text-anchor="middle">Auto-apprentissage</text>
+    <rect x="405" y="468" width="282" height="50" rx="25" fill="#ff4a3b" fill-opacity="0.22" stroke="#ff4a3b" stroke-opacity="0.6"/>
+    <text x="546" y="500" text-anchor="middle">Ponctuation intelligente</text>
+    <rect x="703" y="468" width="252" height="50" rx="25" fill="#fff" fill-opacity="0.10" stroke="#fff" stroke-opacity="0.18"/>
+    <text x="829" y="500" text-anchor="middle">Bureau à distance</text>
+    <rect x="971" y="468" width="172" height="50" rx="25" fill="#fff" fill-opacity="0.10" stroke="#fff" stroke-opacity="0.18"/>
+    <text x="1057" y="500" text-anchor="middle">Voxtral 3</text>
+  </g>
+
+  <text x="640" y="590" text-anchor="middle" font-size="18" fill="#fff" fill-opacity="0.42">Parakeet v3 · 100 % local · basé sur VoiceInk 2.26 · GPLv3</text>
+</svg>
