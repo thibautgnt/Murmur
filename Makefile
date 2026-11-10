@@ -6,7 +6,7 @@ LOCAL_DERIVED_DATA := $(CURDIR)/.local-build
 LOCAL_CODESIGN_IDENTITY ?= C3542F0B1C830C4B91E42AD38E15C2BD42A8A9D8
 RUN_APP_NAME ?= Murmur
 
-.PHONY: all clean whisper setup build local check healthcheck help dev run release release-setup share dist publish test codeql-build
+.PHONY: all clean whisper setup build local check healthcheck help dev run release release-setup share dist publish test
 
 # Default target
 all: check build
@@ -113,13 +113,6 @@ test: check setup
 		SWIFT_ACTIVE_COMPILATION_CONDITIONS='$$(inherited) LOCAL_BUILD' \
 		-skipPackagePluginValidation \
 		-skipMacroValidation
-
-# Unsigned Debug build in .codeql-build, used by the CodeQL workflow.
-codeql-build: setup
-	xcodebuild build -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Debug \
-		-destination 'platform=macOS' -derivedDataPath "$(CURDIR)/.codeql-build" \
-		CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM="" \
-		-skipPackagePluginValidation -skipMacroValidation
 
 # Run application
 run:
