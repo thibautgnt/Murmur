@@ -48,7 +48,7 @@ final class UpdaterViewModel: ObservableObject {
     private static let postponeInterval: TimeInterval = 24 * 60 * 60
 
     @Published var canCheckForUpdates = true
-    @Published private(set) var checksForUpdatesWhenDashboardAppears: Bool
+    @Published private(set) var automaticallyChecksForUpdates: Bool
     @Published private(set) var availableUpdate: AvailableUpdate?
 
     private let defaults = UserDefaults.standard
@@ -56,7 +56,7 @@ final class UpdaterViewModel: ObservableObject {
     private var timer: Timer?
 
     init() {
-        checksForUpdatesWhenDashboardAppears =
+        automaticallyChecksForUpdates =
             (defaults.object(forKey: DefaultsKey.automaticUpdateChecks) as? Bool) ?? true
 
         Task { @MainActor [weak self] in
@@ -68,10 +68,10 @@ final class UpdaterViewModel: ObservableObject {
         }
     }
 
-    func setChecksForUpdatesWhenDashboardAppears(_ value: Bool) {
-        guard checksForUpdatesWhenDashboardAppears != value else { return }
+    func setAutomaticallyChecksForUpdates(_ value: Bool) {
+        guard automaticallyChecksForUpdates != value else { return }
 
-        checksForUpdatesWhenDashboardAppears = value
+        automaticallyChecksForUpdates = value
         defaults.set(value, forKey: DefaultsKey.automaticUpdateChecks)
 
         if value {
@@ -83,7 +83,7 @@ final class UpdaterViewModel: ObservableObject {
     }
 
     func checkForUpdatesIfDue() {
-        guard checksForUpdatesWhenDashboardAppears, canCheckForUpdates, buildCommit != nil else { return }
+        guard automaticallyChecksForUpdates, canCheckForUpdates, buildCommit != nil else { return }
 
         if let lastCheck = defaults.object(forKey: DefaultsKey.lastUpdateCheck) as? Date {
             let elapsed = Date().timeIntervalSince(lastCheck)
