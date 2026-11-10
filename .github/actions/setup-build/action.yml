@@ -18,8 +18,8 @@ runs:
       uses: actions/cache@v4
       with:
         path: ~/VoiceInk-Dependencies
-        key: whisper-${{ runner.os }}-${{ hashFiles('Makefile') }}-${{ github.run_id }}
-        restore-keys: whisper-${{ runner.os }}-${{ hashFiles('Makefile') }}-
+        # Bump the version to rebuild whisper.cpp from its latest sources.
+        key: whisper-${{ runner.os }}-v1
 
     - name: Build whisper.xcframework
       shell: bash

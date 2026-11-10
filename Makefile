@@ -157,11 +157,12 @@ dist:
 	@rm -f "$(LOCAL_DERIVED_DATA)/Murmur.zip"
 	@ditto -c -k --keepParent "$$HOME/Downloads/Murmur.app" "$(LOCAL_DERIVED_DATA)/Murmur.zip"
 	@rm -rf "$$HOME/Downloads/Murmur.app"
+	@/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$(APP_PLIST)" > "$(LOCAL_DERIVED_DATA)/VERSION"
 
-# Notes come from docs/releases/<version>.md when it exists. DRAFT=1 keeps the release hidden from the updater.
+# Notes come from docs/releases/<version>.md when it exists. TAG=<existing tag> reuses it; DRAFT=1 keeps the release hidden from the updater.
 publish:
-	@VERSION=$$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$(APP_PLIST)"); \
-	TAG="v$$VERSION-$$(date +%Y%m%d)-$$(git rev-parse --short HEAD)"; \
+	@VERSION=$$(cat "$(LOCAL_DERIVED_DATA)/VERSION"); \
+	TAG="$(TAG)"; [ -n "$$TAG" ] || TAG="v$$VERSION-$$(date +%Y%m%d)-$$(git rev-parse --short HEAD)"; \
 	NOTES="docs/releases/$$VERSION.md"; test -f "$$NOTES" || NOTES=scripts/share-notes.md; \
 	gh release create -R thibautgnt/Murmur "$$TAG" "$(LOCAL_DERIVED_DATA)/Murmur.zip" --target "$$(git rev-parse HEAD)" \
 		--title "Murmur $$VERSION ($$(date +%d/%m/%Y))" --notes-file "$$NOTES" $(if $(DRAFT),--draft)

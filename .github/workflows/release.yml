@@ -1,6 +1,8 @@
 name: Release
 
 on:
+  push:
+    tags: ["v*"]
   workflow_dispatch:
     inputs:
       draft:
@@ -12,27 +14,84 @@ concurrency:
   group: release
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
-  ci:
-    uses: ./.github/workflows/ci.yml
+  inspect:
+    name: Inspect
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       contents: read
+      security-events: read
+    steps:
+      - uses: actions/checkout@v4
 
-  release:
-    name: Build and publish
-    needs: ci
+      - name: Repository checks
+        run: python3 scripts/check-murmur.py
+
+      - name: No open CodeQL alert of high severity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ALERTS=$(gh api "repos/$GITHUB_REPOSITORY/code-scanning/alerts?state=open&per_page=100" --paginate \
+            -q '.[] | select(.rule.security_severity_level == "critical" or .rule.security_severity_level == "high") | "\(.rule.id) \(.most_recent_instance.location.path):\(.most_recent_instance.location.start_line)"')
+          if [ -n "$ALERTS" ]; then
+            echo "Open CodeQL alerts block the release:"
+            echo "$ALERTS"
+            exit 1
+          fi
+          echo "No blocking CodeQL alert"
+
+  test:
+    name: Unit tests
+    needs: inspect
     runs-on: macos-latest
-    timeout-minutes: 90
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-build
+      - run: make test
+
+  build:
+    name: Build Murmur.zip
+    needs: inspect
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-build
+      - run: make dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: murmur
+          path: |
+            .local-build/Murmur.zip
+            .local-build/VERSION
+          retention-days: 7
+
+  publish:
+    name: Publish
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-build
-
-      - name: Build Murmur.zip
-        run: make dist
-
+      - uses: actions/download-artifact@v4
+        with:
+          name: murmur
+          path: .local-build
+      # A pushed tag already exists, so the release only attaches to it; "-rc" tags make drafts for trial runs.
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: make publish ${{ inputs.draft && 'DRAFT=1' || '' }}
+          DRAFT: ${{ (inputs.draft || contains(github.ref_name, '-rc')) && '1' || '' }}
+        run: |
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            make publish TAG="$GITHUB_REF_NAME" DRAFT="$DRAFT"
+          else
+            make publish DRAFT="$DRAFT"
+          fi
