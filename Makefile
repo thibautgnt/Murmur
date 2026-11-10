@@ -6,7 +6,7 @@ LOCAL_DERIVED_DATA := $(CURDIR)/.local-build
 LOCAL_CODESIGN_IDENTITY ?= C3542F0B1C830C4B91E42AD38E15C2BD42A8A9D8
 RUN_APP_NAME ?= Murmur
 
-.PHONY: all clean whisper setup build local check healthcheck help dev run release release-setup share
+.PHONY: all clean whisper setup build local check healthcheck help dev run release release-setup share dist publish
 
 # Default target
 all: check build
@@ -133,20 +133,31 @@ install: local
 	@echo "Installed /Applications/Murmur.app"
 
 # Ad-hoc build published as a GitHub release of this private repo, for collaborators without a developer account
-share:
-	@git diff --quiet HEAD && test -z "$$(git log origin/main..HEAD)" || { echo "Commit and push first"; exit 1; }
+APP_PLIST := $(LOCAL_DERIVED_DATA)/Build/Products/Release/Murmur.app/Contents/Info.plist
+
+# Ad-hoc build zipped at .local-build/Murmur.zip, stamped with the commit the updater compares against.
+dist:
 	@$(MAKE) local LOCAL_CODESIGN_IDENTITY=-
 	@/usr/libexec/PlistBuddy -c "Add :MurmurCommit string $$(git rev-parse HEAD)" "$$HOME/Downloads/Murmur.app/Contents/Info.plist"
 	@codesign --force --deep --options runtime --timestamp=none \
 		--entitlements "$(CURDIR)/VoiceInk/VoiceInk.local.entitlements" \
 		--sign - "$$HOME/Downloads/Murmur.app"
-	@VERSION=$$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$$HOME/Downloads/Murmur.app/Contents/Info.plist"); \
+	@rm -f "$(LOCAL_DERIVED_DATA)/Murmur.zip"
+	@ditto -c -k --keepParent "$$HOME/Downloads/Murmur.app" "$(LOCAL_DERIVED_DATA)/Murmur.zip"
+	@rm -rf "$$HOME/Downloads/Murmur.app"
+
+# Notes come from docs/releases/<version>.md when it exists. DRAFT=1 keeps the release hidden from the updater.
+publish:
+	@VERSION=$$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$(APP_PLIST)"); \
 	TAG="v$$VERSION-$$(date +%Y%m%d)-$$(git rev-parse --short HEAD)"; \
-	rm -f "$(LOCAL_DERIVED_DATA)/Murmur.zip"; \
-	ditto -c -k --keepParent "$$HOME/Downloads/Murmur.app" "$(LOCAL_DERIVED_DATA)/Murmur.zip" && \
-	rm -rf "$$HOME/Downloads/Murmur.app" && \
+	NOTES="docs/releases/$$VERSION.md"; test -f "$$NOTES" || NOTES=scripts/share-notes.md; \
 	gh release create -R thibautgnt/Murmur "$$TAG" "$(LOCAL_DERIVED_DATA)/Murmur.zip" --target "$$(git rev-parse HEAD)" \
-		--title "Murmur $$VERSION ($$(date +%d/%m/%Y))" --notes-file scripts/share-notes.md
+		--title "Murmur $$VERSION ($$(date +%d/%m/%Y))" --notes-file "$$NOTES" $(if $(DRAFT),--draft)
+
+share:
+	@git diff --quiet HEAD && test -z "$$(git log origin/main..HEAD)" || { echo "Commit and push first"; exit 1; }
+	@$(MAKE) dist
+	@$(MAKE) publish
 
 # Build a signed, notarized DMG and matching local Sparkle Appcast.
 release: whisper
@@ -177,7 +188,9 @@ help:
 	@echo "    LOCAL_CODESIGN_IDENTITY=<SHA or name> overrides automatic Apple Development detection"
 	@echo "  run                Launch the built Murmur app"
 	@echo "  dev                Build and run the app (for development)"
-	@echo "  share              Publish an ad-hoc build as a GitHub release for collaborators"
+	@echo "  dist               Build an ad-hoc Murmur.zip in .local-build"
+	@echo "  publish            Create the GitHub release from that zip (DRAFT=1 for a draft)"
+	@echo "  share              dist + publish, from a pushed commit"
 	@echo "  release            Build DMG and Appcast using release-notes/<version>.html"
 	@echo "  release-setup      Store notarization credentials in Keychain"
 	@echo "  all                Run full build process (default)"
