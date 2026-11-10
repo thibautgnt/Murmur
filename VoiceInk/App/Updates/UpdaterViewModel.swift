@@ -44,6 +44,7 @@ final class UpdaterViewModel: ObservableObject {
     private static let logger = Logger(subsystem: "com.prakashjoshipax.voiceink", category: "Updater")
     private static let repository = "thibautgnt/Murmur"
     private static let assetName = "Murmur.zip"
+    private static let teamIdentifier = "33MB9HPP65"
     private static let checkInterval: TimeInterval = 6 * 60 * 60
     private static let postponeInterval: TimeInterval = 24 * 60 * 60
 
@@ -208,7 +209,12 @@ final class UpdaterViewModel: ObservableObject {
 
         try await run("/usr/bin/ditto", ["-x", "-k", archive.path, workDirectory.path])
         let newApp = workDirectory.appendingPathComponent("Murmur.app")
-        try await run("/usr/bin/codesign", ["--verify", "--deep", "--strict", newApp.path])
+        // Only our team's signature keeps macOS permissions, and rejects a tampered or ad-hoc archive.
+        try await run("/usr/bin/codesign", [
+            "--verify", "--deep", "--strict",
+            "-R=anchor apple generic and certificate leaf[subject.OU] = \"\(Self.teamIdentifier)\"",
+            newApp.path,
+        ])
 
         // The running bundle cannot be replaced in place: a detached shell waits for
         // this process to exit, swaps the bundle (restoring it on failure) and relaunches.

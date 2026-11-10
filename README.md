@@ -51,15 +51,10 @@
 ## Installer
 
 1. Télécharger `Murmur.zip` depuis la [dernière version](https://github.com/thibautgnt/Murmur/releases/latest), le décompresser et glisser `Murmur.app` dans **Applications**.
-2. L'app n'est pas signée par Apple : une seule fois, dans le Terminal :
-   ```bash
-   xattr -cr /Applications/Murmur.app
-   ```
-   À défaut : ouvrir l'app, puis **Réglages Système › Confidentialité et sécurité › Ouvrir quand même**.
-3. Ouvrir Murmur et accorder le **micro** et l'**accessibilité**. Le modèle Parakeet se télécharge au premier lancement.
+2. Ouvrir Murmur et accorder le **micro** et l'**accessibilité**. Le modèle Parakeet se télécharge au premier lancement.
 
 Ensuite, Murmur vérifie lui-même les nouvelles versions (interrupteur **Vérifier automatiquement les mises à jour**
-dans les Paramètres). Après une mise à jour, macOS peut redemander les autorisations.
+dans les Paramètres). L'app est signée et notarisée : les autorisations accordées restent valables après une mise à jour.
 
 > [!NOTE]
 > Murmur partage ses réglages et ses données avec VoiceInk : ne pas installer les deux sur le même Mac.

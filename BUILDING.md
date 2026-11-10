@@ -42,6 +42,8 @@ Local builds do not include iCloud dictionary sync or automatic updates. Ad-hoc 
 - `make run` — launch `~/Downloads/VoiceInk.app`, or the first app found in DerivedData
 - `make release` — create the signed release package
 - `make release-setup` — configure release notarization credentials
+- `make dist-setup` — store the notarization profile `make dist` uses (Apple ID and app-specific password of team 33MB9HPP65)
+- `make dist` — build `.local-build/Murmur.zip`, signed with Developer ID and notarized; `DIST_CODESIGN_IDENTITY=-` makes an ad-hoc trial build
 - `make clean` — remove `~/VoiceInk-Dependencies`
 - `make help` — list all commands
 

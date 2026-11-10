@@ -4,9 +4,13 @@ WHISPER_CPP_DIR := $(DEPS_DIR)/whisper.cpp
 FRAMEWORK_PATH := $(WHISPER_CPP_DIR)/build-apple/whisper.xcframework
 LOCAL_DERIVED_DATA := $(CURDIR)/.local-build
 LOCAL_CODESIGN_IDENTITY ?= C3542F0B1C830C4B91E42AD38E15C2BD42A8A9D8
+DIST_CODESIGN_IDENTITY ?= Developer ID Application: Thibaut Genet (33MB9HPP65)
+NOTARY_TEAM_ID ?= 33MB9HPP65
+NOTARY_PROFILE ?= Murmur-Notarization
+NOTARY_KEYCHAIN ?=
 RUN_APP_NAME ?= Murmur
 
-.PHONY: all clean whisper setup build local check healthcheck help dev run release release-setup share dist publish test
+.PHONY: all clean whisper setup build local check healthcheck help dev run release release-setup share dist publish dist-setup test
 
 # Default target
 all: check build
@@ -144,18 +148,25 @@ install: local
 	@rm -rf "$$HOME/Downloads/Murmur.app"
 	@echo "Installed /Applications/Murmur.app"
 
-# Ad-hoc build published as a GitHub release of this private repo, for collaborators without a developer account
+# Developer ID build published as a GitHub release of this private repo; a stable signature keeps macOS permissions across updates
 APP_PLIST := $(LOCAL_DERIVED_DATA)/Build/Products/Release/Murmur.app/Contents/Info.plist
 
-# Ad-hoc build zipped at .local-build/Murmur.zip, stamped with the commit the updater compares against.
+# Signed and notarized build zipped at .local-build/Murmur.zip, stamped with the commit the updater compares against.
+# DIST_CODESIGN_IDENTITY=- makes an ad-hoc build without notarization, for trials only.
 dist:
 	@$(MAKE) local LOCAL_CODESIGN_IDENTITY=-
 	@/usr/libexec/PlistBuddy -c "Add :MurmurCommit string $$(git rev-parse HEAD)" "$$HOME/Downloads/Murmur.app/Contents/Info.plist"
-	@codesign --force --deep --options runtime --timestamp=none \
-		--entitlements "$(CURDIR)/VoiceInk/VoiceInk.local.entitlements" \
-		--sign - "$$HOME/Downloads/Murmur.app"
+	@./scripts/sign-app.sh "$$HOME/Downloads/Murmur.app" "$(DIST_CODESIGN_IDENTITY)" "$(CURDIR)/VoiceInk/VoiceInk.local.entitlements"
 	@rm -f "$(LOCAL_DERIVED_DATA)/Murmur.zip"
 	@ditto -c -k --keepParent "$$HOME/Downloads/Murmur.app" "$(LOCAL_DERIVED_DATA)/Murmur.zip"
+	@if [ "$(DIST_CODESIGN_IDENTITY)" != "-" ]; then \
+		xcrun notarytool submit "$(LOCAL_DERIVED_DATA)/Murmur.zip" --keychain-profile "$(NOTARY_PROFILE)" \
+			$(if $(NOTARY_KEYCHAIN),--keychain "$(NOTARY_KEYCHAIN)") --wait && \
+		xcrun stapler staple "$$HOME/Downloads/Murmur.app" && \
+		spctl --assess --type execute --verbose "$$HOME/Downloads/Murmur.app" && \
+		rm -f "$(LOCAL_DERIVED_DATA)/Murmur.zip" && \
+		ditto -c -k --keepParent "$$HOME/Downloads/Murmur.app" "$(LOCAL_DERIVED_DATA)/Murmur.zip"; \
+	fi
 	@rm -rf "$$HOME/Downloads/Murmur.app"
 	@/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$(APP_PLIST)" > "$(LOCAL_DERIVED_DATA)/VERSION"
 
@@ -184,6 +195,10 @@ release: whisper
 release-setup:
 	@./scripts/setup-release-notarization.sh
 
+# Store the notarization credentials that `make dist` uses, for the Murmur team.
+dist-setup:
+	@VOICEINK_NOTARY_PROFILE="$(NOTARY_PROFILE)" NOTARY_TEAM_ID="$(NOTARY_TEAM_ID)" ./scripts/setup-release-notarization.sh
+
 # Cleanup
 clean:
 	@echo "Cleaning build artifacts..."
@@ -202,7 +217,8 @@ help:
 	@echo "    LOCAL_CODESIGN_IDENTITY=<SHA or name> overrides automatic Apple Development detection"
 	@echo "  run                Launch the built Murmur app"
 	@echo "  dev                Build and run the app (for development)"
-	@echo "  dist               Build an ad-hoc Murmur.zip in .local-build"
+	@echo "  dist               Build a signed, notarized Murmur.zip in .local-build"
+	@echo "  dist-setup         Store the notarization credentials dist uses in Keychain"
 	@echo "  publish            Create the GitHub release from that zip (DRAFT=1 for a draft)"
 	@echo "  share              dist + publish, from a pushed commit"
 	@echo "  release            Build DMG and Appcast using release-notes/<version>.html"
