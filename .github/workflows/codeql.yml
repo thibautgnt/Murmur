@@ -33,6 +33,11 @@ jobs:
       - if: matrix.language == 'swift'
         uses: ./.github/actions/setup-build
 
+      # Metal shaders fail to compile under the CodeQL tracer, so packages are built before tracing starts.
+      - if: matrix.language == 'swift'
+        name: Build dependencies without tracing
+        run: make codeql-build
+
       - uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
@@ -40,12 +45,10 @@ jobs:
           queries: security-and-quality
 
       - if: matrix.language == 'swift'
-        name: Build for analysis
+        name: Build Murmur for analysis
         run: |
-          xcodebuild build -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Debug \
-            -destination 'platform=macOS' -derivedDataPath .codeql-build \
-            CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM="" \
-            -skipPackagePluginValidation -skipMacroValidation
+          rm -rf .codeql-build/Build/Intermediates.noindex/VoiceInk.build
+          make codeql-build
 
       - uses: github/codeql-action/analyze@v3
         with:
