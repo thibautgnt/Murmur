@@ -1,0 +1,26 @@
+name: Set up the Murmur build
+description: Newest Xcode on the runner, Metal toolchain and a cached whisper.xcframework
+runs:
+  using: composite
+  steps:
+    - name: Select the newest Xcode
+      shell: bash
+      run: |
+        XCODE=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+        sudo xcode-select -s "$XCODE"
+        xcodebuild -version
+
+    - name: Download the Metal toolchain
+      shell: bash
+      run: xcodebuild -downloadComponent MetalToolchain
+
+    - name: Cache whisper.cpp
+      uses: actions/cache@v4
+      with:
+        path: ~/VoiceInk-Dependencies
+        key: whisper-${{ runner.os }}-${{ hashFiles('Makefile') }}-${{ github.run_id }}
+        restore-keys: whisper-${{ runner.os }}-${{ hashFiles('Makefile') }}-
+
+    - name: Build whisper.xcframework
+      shell: bash
+      run: make setup

@@ -69,7 +69,7 @@ class CursorPaster {
         let queueWaitMs = elapsedMilliseconds(since: requestedAt)
         let sessionID = UUID().uuidString
         let preferredMethod = PasteMethod.current()
-        let method = resolvedMethod(preferredMethod, for: NSWorkspace.shared.frontmostApplication)
+        let method = resolvedMethod(preferredMethod, forBundleAt: NSWorkspace.shared.frontmostApplication?.bundleURL)
         let originalText = method.usesClipboard ? text : DirectTextTyper.normalizedText(text)
         var textToDeliver = originalText
         let smartPunctuation = UserDefaults.standard.bool(forKey: SmartPunctuation.settingsKey)
@@ -170,8 +170,8 @@ class CursorPaster {
 
     // Electron apps feed key events to xterm.js-style hidden textareas, which
     // retype the tail of fast Unicode events; paste there and restore the clipboard.
-    private static func resolvedMethod(_ method: PasteMethod, for application: NSRunningApplication?) -> PasteMethod {
-        guard method == .directTyping, let bundleURL = application?.bundleURL else { return method }
+    static func resolvedMethod(_ method: PasteMethod, forBundleAt bundleURL: URL?) -> PasteMethod {
+        guard method == .directTyping, let bundleURL else { return method }
         let electronFramework = bundleURL.appendingPathComponent("Contents/Frameworks/Electron Framework.framework")
         return FileManager.default.fileExists(atPath: electronFramework.path) ? .standard : method
     }

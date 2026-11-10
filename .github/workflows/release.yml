@@ -8,35 +8,26 @@ on:
         type: boolean
         default: false
 
-permissions:
-  contents: write
-
 concurrency:
   group: release
   cancel-in-progress: false
 
 jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
   release:
+    name: Build and publish
+    needs: ci
     runs-on: macos-latest
     timeout-minutes: 90
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
-
-      - name: Select the newest Xcode
-        run: |
-          XCODE=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
-          sudo xcode-select -s "$XCODE"
-          xcodebuild -version
-
-      - name: Download the Metal toolchain
-        run: xcodebuild -downloadComponent MetalToolchain
-
-      - name: Cache whisper.cpp
-        uses: actions/cache@v4
-        with:
-          path: ~/VoiceInk-Dependencies
-          key: whisper-${{ runner.os }}-${{ hashFiles('Makefile') }}-${{ github.run_id }}
-          restore-keys: whisper-${{ runner.os }}-${{ hashFiles('Makefile') }}-
+      - uses: ./.github/actions/setup-build
 
       - name: Build Murmur.zip
         run: make dist

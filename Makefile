@@ -6,7 +6,7 @@ LOCAL_DERIVED_DATA := $(CURDIR)/.local-build
 LOCAL_CODESIGN_IDENTITY ?= C3542F0B1C830C4B91E42AD38E15C2BD42A8A9D8
 RUN_APP_NAME ?= Murmur
 
-.PHONY: all clean whisper setup build local check healthcheck help dev run release release-setup share dist publish
+.PHONY: all clean whisper setup build local check healthcheck help dev run release release-setup share dist publish test
 
 # Default target
 all: check build
@@ -102,6 +102,18 @@ local: check setup
 		exit 1; \
 	fi
 
+# Unit tests (VoiceInkTests), ad-hoc signed like local builds.
+test: check setup
+	xcodebuild test -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Debug -destination 'platform=macOS' \
+		-only-testing:VoiceInkTests \
+		-derivedDataPath "$(CURDIR)/.test-build" \
+		-xcconfig LocalBuild.xcconfig \
+		CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO DEVELOPMENT_TEAM="" \
+		CODE_SIGN_ENTITLEMENTS="$(CURDIR)/VoiceInk/VoiceInk.local.entitlements" \
+		SWIFT_ACTIVE_COMPILATION_CONDITIONS='$$(inherited) LOCAL_BUILD' \
+		-skipPackagePluginValidation \
+		-skipMacroValidation
+
 # Run application
 run:
 	@if [ -d "$$HOME/Downloads/$(RUN_APP_NAME).app" ]; then \
@@ -184,6 +196,7 @@ help:
 	@echo "  whisper            Clone and build whisper.cpp XCFramework"
 	@echo "  setup              Copy whisper XCFramework to the project"
 	@echo "  build              Build the Xcode project"
+	@echo "  test               Run the unit tests"
 	@echo "  local              Build locally with stable signing when available"
 	@echo "    LOCAL_CODESIGN_IDENTITY=<SHA or name> overrides automatic Apple Development detection"
 	@echo "  run                Launch the built Murmur app"
