@@ -28,7 +28,7 @@ final class VoiceInkRefineService: ObservableObject {
     static let providerName = "VoiceInk Refine"
     static let modelName = "VoiceInk Refine V1"
     static let systemPrompt = """
-        Transform raw ASR input into polished text. Preserve the original meaning and tone. Handle punctuation, capitalization, and spoken formatting cues properly. Remove fillers, repetitions, false starts, and discarded self-corrections. Output only the final text.
+        Transform raw ASR input into polished text. Preserve the original meaning and tone. Handle punctuation, capitalization, and spoken formatting cues properly. Remove fillers, repetitions, false starts, and discarded self-corrections. Keep the language of the input: never translate. Output only the final text.
         """
     static let repositoryID = "beingpax/VoiceInk-Refine-V1"
     static let pinnedRevision = "ad665418d3850e379e29236e66be3ddc0ac0bf04"
