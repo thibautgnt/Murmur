@@ -38881,6 +38881,16 @@
         }
       }
     },
+    "Your organization installs Murmur and its updates on this Mac." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre organisation installe Murmur et ses mises à jour sur ce Mac."
+          }
+        }
+      }
+    },
     "A new version of Murmur is available" : {
       "localizations" : {
         "fr" : {

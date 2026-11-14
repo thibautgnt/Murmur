@@ -153,9 +153,13 @@ APP_PLIST := $(LOCAL_DERIVED_DATA)/Build/Products/Release/Murmur.app/Contents/In
 
 # Signed and notarized build zipped at .local-build/Murmur.zip, stamped with the commit the updater compares against.
 # DIST_CODESIGN_IDENTITY=- makes an ad-hoc build without notarization, for trials only.
+# The version gains the commit count (2.26.<count>) so Munki sees each release of one upstream version as newer; needs full history.
+# shortcut: an upstream patch version (2.26 -> 2.26.1) would compare lower than 2.26.<count>; switch Munki to a build-number key then.
 dist:
 	@$(MAKE) local LOCAL_CODESIGN_IDENTITY=-
 	@/usr/libexec/PlistBuddy -c "Add :MurmurCommit string $$(git rev-parse HEAD)" "$$HOME/Downloads/Murmur.app/Contents/Info.plist"
+	@PLIST="$$HOME/Downloads/Murmur.app/Contents/Info.plist"; \
+		/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$$PLIST").$$(git rev-list --count HEAD)" "$$PLIST"
 	@./scripts/sign-app.sh "$$HOME/Downloads/Murmur.app" "$(DIST_CODESIGN_IDENTITY)" "$(CURDIR)/VoiceInk/VoiceInk.local.entitlements"
 	@rm -f "$(LOCAL_DERIVED_DATA)/Murmur.zip"
 	@ditto -c -k --keepParent "$$HOME/Downloads/Murmur.app" "$(LOCAL_DERIVED_DATA)/Murmur.zip"

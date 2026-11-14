@@ -61,6 +61,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/setup-build
       - name: Import the Developer ID certificate and notarization credentials
         env:

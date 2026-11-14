@@ -131,6 +131,10 @@ final class UpdaterViewModel: ObservableObject {
         guard let buildCommit else {
             return .unavailable(String(localized: "This development build cannot check for updates."))
         }
+        // A bundle owned by root comes from Munki: only managedsoftwareupdate may replace it.
+        guard FileManager.default.isWritableFile(atPath: Bundle.main.bundlePath) else {
+            return .unavailable(String(localized: "Your organization installs Murmur and its updates on this Mac."))
+        }
 
         do {
             let release: Release = try await fetchJSON("releases/latest")
