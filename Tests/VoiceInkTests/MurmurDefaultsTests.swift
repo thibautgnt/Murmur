@@ -53,3 +53,22 @@ struct ElectronPasteTests {
         #expect(CursorPaster.resolvedMethod(method, forBundleAt: bundle) == method)
     }
 }
+
+@Suite("VoiceInk Refine language")
+struct RefineLanguageTests {
+    @Test func englishAnswerToFrenchDictationIsATranslation() {
+        #expect(VoiceInkRefineService.isTranslation(
+            of: "On va envoyer ça en prod sans attendre d'avocats",
+            "We are going to send it to production without waiting for lawyers."))
+        #expect(VoiceInkRefineService.isTranslation(of: "Vas-y installe-le.", "Install it."))
+    }
+
+    @Test func frenchWithEnglishWordsIsKept() {
+        #expect(!VoiceInkRefineService.isTranslation(
+            of: "euh change le skill s'il faut",
+            "Change le skill s'il faut."))
+        #expect(!VoiceInkRefineService.isTranslation(
+            of: "on push le fix sur la branche main et on merge la PR",
+            "On push le fix sur la branche main et on merge la PR."))
+    }
+}

@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import NaturalLanguage
 import OSLog
 
 enum VoiceInkRefineAvailability: Equatable {
@@ -145,12 +146,28 @@ final class VoiceInkRefineService: ObservableObject {
             throw VoiceInkRefineError.modelNotDownloaded
         }
 
-        return try await inferenceClient.enhance(
+        let refined = try await inferenceClient.enhance(
             transcript: transcript,
             modelDirectory: snapshotURL,
             systemPrompt: [Self.systemPrompt, vocabulary.enhancementSection]
                 .filter { !$0.isEmpty }.joined(separator: "\n\n")
         )
+        // The prompt alone did not stop it: about 8% of French dictations still came back in English.
+        if Self.isTranslation(of: transcript, refined) {
+            logger.notice("VoiceInk Refine changed the language, keeping the transcript")
+            return transcript
+        }
+        return refined
+    }
+
+    static func isTranslation(of input: String, _ output: String) -> Bool {
+        let inputRecognizer = NLLanguageRecognizer()
+        inputRecognizer.processString(input)
+        guard let language = inputRecognizer.dominantLanguage,
+              (inputRecognizer.languageHypotheses(withMaximum: 3)[language] ?? 0) >= 0.6 else { return false }
+        let outputRecognizer = NLLanguageRecognizer()
+        outputRecognizer.processString(output)
+        return (outputRecognizer.languageHypotheses(withMaximum: 3)[language] ?? 0) < 0.2
     }
 
     func unloadPreparedModelIfNeeded() async {
